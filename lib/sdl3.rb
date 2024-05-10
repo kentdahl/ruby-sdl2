@@ -1,3 +1,3 @@
-require 'sdl2_ext'
-require 'sdl2/version'
+require 'sdl3_ext'
+require 'sdl3/version'
 
