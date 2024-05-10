@@ -137,7 +137,7 @@ static VALUE Event_s_enabled_p(VALUE self)
         rb_warn("You cannot enable %s directly", rb_class2name(self));
         return Qfalse;
     }
-    return INT2BOOL(SDL_EventState(NUM2INT(event_type), SDL_QUERY) == SDL_ENABLE);
+    return INT2BOOL(SDL_EventEnabled(NUM2INT(event_type)) == SDL_TRUE);
 }
 
 /*
@@ -160,7 +160,7 @@ static VALUE Event_s_set_enable(VALUE self, VALUE val)
     VALUE event_type = rb_iv_get(self, "event_type");
     if (event_type == Qnil) 
         rb_raise(rb_eArgError, "You cannot enable %s directly", rb_class2name(self));
-    SDL_EventState(NUM2INT(event_type), RTEST(val) ? SDL_ENABLE : SDL_DISABLE);
+    SDL_SetEventEnabled(NUM2INT(event_type), RTEST(val) ? SDL_TRUE : SDL_FALSE);
     return val;
 }
 
@@ -296,7 +296,7 @@ static VALUE Event_window(VALUE self)
  *
  */
 EVENT_ACCESSOR_UINT(Window, window_id, window.windowID);
-EVENT_ACCESSOR_UINT(Window, event, window.event);
+EVENT_ACCESSOR_UINT(Window, event, window.type);
 EVENT_ACCESSOR_INT(Window, data1, window.data1);
 EVENT_ACCESSOR_INT(Window, data2, window.data2);
 
@@ -306,7 +306,7 @@ static VALUE EvWindow_inspect(VALUE self)
     SDL_Event* ev; Data_Get_Struct(self, SDL_Event, ev);
     return rb_sprintf("<%s: type=%u timestamp=%u window_id=%u event=%u data1=%d data2=%d>",
                       rb_obj_classname(self), ev->common.type, ev->common.timestamp,
-                      ev->window.windowID, ev->window.event,
+                      ev->window.windowID, ev->window.type,
                       ev->window.data1, ev->window.data2);
 }
 
@@ -810,9 +810,9 @@ static VALUE EvJoyDevice_inspect(VALUE self)
  *   the axis value (range: -32768 to -32767, 0 for newtral)
  *   @return [Integer]
  */
-EVENT_ACCESSOR_INT(ControllerAxis, which, caxis.which);
-EVENT_ACCESSOR_UINT8(ControllerAxis, axis, caxis.axis);
-EVENT_ACCESSOR_INT(ControllerAxis, value, caxis.value);
+EVENT_ACCESSOR_INT(ControllerAxis, which, gaxis.which);
+EVENT_ACCESSOR_UINT8(ControllerAxis, axis, gaxis.axis);
+EVENT_ACCESSOR_INT(ControllerAxis, value, gaxis.value);
 /* @return [String] inspection string */
 static VALUE ControllerAxis_inspect(VALUE self)
 {
@@ -820,8 +820,8 @@ static VALUE ControllerAxis_inspect(VALUE self)
     return rb_sprintf("<%s: type=%u timestamp=%u"
                       " which=%d axis=%s value=%d>",
                       rb_obj_classname(self), ev->common.type, ev->common.timestamp,
-                      ev->caxis.which, SDL_GetGamepadStringForAxis(ev->caxis.axis),
-                      ev->caxis.value);
+                      ev->gaxis.which, SDL_GetGamepadStringForAxis(ev->gaxis.axis),
+                      ev->gaxis.value);
 }
 
 /*
@@ -847,9 +847,9 @@ static VALUE ControllerAxis_inspect(VALUE self)
  *   @return [Boolean]
  *
  */
-EVENT_ACCESSOR_INT(ControllerButton, which, cbutton.which);
-EVENT_ACCESSOR_UINT8(ControllerButton, button, cbutton.button);
-EVENT_ACCESSOR_BOOL(ControllerButton, pressed, cbutton.state);
+EVENT_ACCESSOR_INT(ControllerButton, which, gbutton.which);
+EVENT_ACCESSOR_UINT8(ControllerButton, button, gbutton.button);
+EVENT_ACCESSOR_BOOL(ControllerButton, pressed, gbutton.state);
 /* @return [String] inspection string */
 static VALUE ControllerButton_inspect(VALUE self)
 {
@@ -857,9 +857,9 @@ static VALUE ControllerButton_inspect(VALUE self)
     return rb_sprintf("<%s: type=%u timestamp=%u"
                       " which=%d button=%s state=%s>",
                       rb_obj_classname(self), ev->common.type, ev->common.timestamp,
-                      ev->cbutton.which,
-                      SDL_GetGamepadStringForButton(ev->cbutton.button),
-                      INT2BOOLCSTR(ev->cbutton.state));
+                      ev->gbutton.which,
+                      SDL_GetGamepadStringForButton(ev->gbutton.button),
+                      INT2BOOLCSTR(ev->gbutton.state));
 }
 /*
  * Document-class: SDL2::Event::ControllerButtonDown
@@ -945,8 +945,8 @@ static VALUE ControllerDevice_inspect(VALUE self)
  *   the quantity of pressure applied, normalized (0...1)
  *   @return [Float]
  */
-EVENT_ACCESSOR_INT(TouchFinger, touch_id, tfinger.touchId);
-EVENT_ACCESSOR_INT(TouchFinger, finger_id, tfinger.fingerId);
+EVENT_ACCESSOR_INT(TouchFinger, touch_id, tfinger.touchID);
+EVENT_ACCESSOR_INT(TouchFinger, finger_id, tfinger.fingerID);
 EVENT_ACCESSOR_DBL(TouchFinger, x, tfinger.x);
 EVENT_ACCESSOR_DBL(TouchFinger, y, tfinger.y);
 EVENT_ACCESSOR_DBL(TouchFinger, pressure, tfinger.pressure);
@@ -958,7 +958,7 @@ static VALUE EvTouchFinger_inspect(VALUE self)
                       " touch_id=%d finger_id=%d"
                       " x=%f y=%f pressure=%f>",
                       rb_obj_classname(self), ev->common.type, ev->common.timestamp,
-                      (int)ev->tfinger.touchId, (int)ev->tfinger.fingerId,
+                      (int)ev->tfinger.touchID, (int)ev->tfinger.fingerID,
                       ev->tfinger.x, ev->tfinger.y, ev->tfinger.pressure);
 }
 
@@ -996,7 +996,7 @@ static VALUE EvFingerMotion_inspect(VALUE self)
                       " x=%f y=%f pressure=%f"
                       " dy=%f dx=%f>",
                       rb_obj_classname(self), ev->common.type, ev->common.timestamp,
-                      (int) ev->tfinger.touchId, (int) ev->tfinger.fingerId,
+                      (int) ev->tfinger.touchID, (int) ev->tfinger.fingerID,
                       ev->tfinger.x, ev->tfinger.y, ev->tfinger.pressure,
                       ev->tfinger.dx, ev->tfinger.dx);
 }
@@ -1025,7 +1025,7 @@ static void init_event_type_to_class(void)
         event_type_to_class[i] = cEvent;
     
     connect_event_class(SDL_EVENT_QUIT, cEvQuit);
-    connect_event_class(SDL_WINDOWEVENT, cEvWindow);
+    connect_event_class(/*SDL_WINDOWEVENT*/ 0x200, cEvWindow); // TODO: Need one for each Window event?
     connect_event_class(SDL_EVENT_KEY_DOWN, cEvKeyDown);
     connect_event_class(SDL_EVENT_KEY_UP, cEvKeyUp);
     connect_event_class(SDL_EVENT_TEXT_EDITING, cEvTextEditing);
@@ -1120,22 +1120,25 @@ void rubysdl2_init_event(void)
     DEFINE_EVENT_ACCESSOR(Window, cEvWindow, data2);
     rb_define_method(cEvWindow, "inspect", EvWindow_inspect, 0);
 #define DEFINE_EVENT_ID_CONST(t) \
-    rb_define_const(cEvWindow, #t, INT2NUM(SDL_WINDOWEVENT_##t))
-    DEFINE_EVENT_ID_CONST(NONE);
+    rb_define_const(cEvWindow, #t, INT2NUM(SDL_EVENT_WINDOW_##t))
+
+    // WAS: DEFINE_EVENT_ID_CONST(NONE);
+    rb_define_const(cEvWindow, "NONE", INT2NUM(0x200)); // reserved for sdl2-compat
+
     DEFINE_EVENT_ID_CONST(SHOWN);
     DEFINE_EVENT_ID_CONST(HIDDEN);
     DEFINE_EVENT_ID_CONST(EXPOSED);
     DEFINE_EVENT_ID_CONST(MOVED);
     DEFINE_EVENT_ID_CONST(RESIZED);
-    DEFINE_EVENT_ID_CONST(SIZE_CHANGED);
+    DEFINE_EVENT_ID_CONST(PIXEL_SIZE_CHANGED);
     DEFINE_EVENT_ID_CONST(MINIMIZED);
     DEFINE_EVENT_ID_CONST(MAXIMIZED);
     DEFINE_EVENT_ID_CONST(RESTORED);
-    DEFINE_EVENT_ID_CONST(ENTER);
-    DEFINE_EVENT_ID_CONST(LEAVE);
+    DEFINE_EVENT_ID_CONST(MOUSE_ENTER);
+    DEFINE_EVENT_ID_CONST(MOUSE_LEAVE);
     DEFINE_EVENT_ID_CONST(FOCUS_GAINED);
     DEFINE_EVENT_ID_CONST(FOCUS_LOST);
-    DEFINE_EVENT_ID_CONST(CLOSE);
+    DEFINE_EVENT_ID_CONST(CLOSE_REQUESTED);
     
                     
     DEFINE_EVENT_ACCESSOR(Keyboard, cEvKeyboard, window_id);
