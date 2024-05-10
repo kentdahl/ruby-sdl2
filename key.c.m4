@@ -252,7 +252,7 @@ define(`DEFINE_KEYCODE_NUMBER',`/$8* @return [Integer] keycode for number key "$
 define(`DEFINE_KEYCODE_ALPH',`/$8* @return [Integer] keycode for alphabet key "$1" *$8/
     rb_define_const(mKey, "translit($1,`a-z',`A-Z')", INT2NUM(SDLK_$1))')
 
-define(`DEFINE_KEYMOD',`rb_define_const(mMod, "$1", INT2NUM(KMOD_$1))')
+define(`DEFINE_KEYMOD',`rb_define_const(mMod, "$1", INT2NUM(SDL_KMOD_$1))')
 */
 void rubysdl2_init_key(void)
 {
