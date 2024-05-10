@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'rubygems/package_task'
 require 'rake/clean'
-require_relative "lib/sdl2/version"
+require_relative "lib/sdl3/version"
 
 C_M4_FILES = Dir.glob("*.c.m4")
 C_FROM_M4_FILES = C_M4_FILES.map{|path| path.gsub(/\.c\.m4\Z/, ".c") }
@@ -22,7 +22,7 @@ CLOBBER.include(*C_FROM_M4_FILES)
 locale = ENV["YARD_LOCALE"]
 
 def extconf_options
-  return ENV["RUBYSDL2_EXTCONF_OPTS"] if ENV["RUBYSDL2_EXTCONF_OPTS"]
+  return ENV["RUBYSDL3_EXTCONF_OPTS"] if ENV["RUBYSDL3_EXTCONF_OPTS"]
   return ENV["EXTCONF_OPTS"] if ENV["EXTCONF_OPTS"]
   
   begin
@@ -34,11 +34,11 @@ end
 
 def gem_spec
   Gem::Specification.new do |spec|
-    spec.name = "ruby-sdl2"
-    spec.version = SDL2::VERSION
+    spec.name = "ruby-sdl3"
+    spec.version = SDL3::VERSION
     spec.summary = "The simple ruby extension library for SDL 2.x"
     spec.description = <<-EOS
-      Ruby/SDL2 is an extension library to use SDL 2.x
+      Ruby/SDL3 is an extension library to use SDL 2.x
       (Simple DirectMedia Layer). SDL 2.x is quite refined
       from SDL 1.x and API is changed.
       This library enables you to control audio, keyboard,
@@ -56,8 +56,8 @@ def gem_spec
   end
 end
 
-task "pot" => "doc/po/rubysdl2.pot"
-file "doc/po/rubysdl2.pot" => POT_SOURCES do |t|
+task "pot" => "doc/po/rubysdl3.pot"
+file "doc/po/rubysdl3.pot" => POT_SOURCES do |t|
   sh "yard i18n -o #{t.name} #{POT_SOURCES.join(" ")}"
 end
 
@@ -65,11 +65,11 @@ if locale
   PO_FILE = "doc/po/#{locale}.po"
   
   task "init-po" do
-    sh "rmsginit -i doc/po/rubysdl2.pot -o #{PO_FILE} -l #{locale}"
+    sh "rmsginit -i doc/po/rubysdl3.pot -o #{PO_FILE} -l #{locale}"
   end
 
   task "merge-po" do
-    sh "rmsgmerge -o #{PO_FILE} #{PO_FILE} doc/po/rubysdl2.pot"
+    sh "rmsgmerge -o #{PO_FILE} #{PO_FILE} doc/po/rubysdl3.pot"
   end
 
   task "doc" => [PO_FILE] do
@@ -109,7 +109,7 @@ rule ".gem" => C_FILES
 
 task "watch-doc" do
   loop do
-    sh "inotifywait -e modify #{WATCH_TARGETS.join(" ")} && rake doc && notify-send -u low \"Ruby/SDL2 build doc OK\""
+    sh "inotifywait -e modify #{WATCH_TARGETS.join(" ")} && rake doc && notify-send -u low \"Ruby/SDL3 build doc OK\""
   end
 end
 
@@ -117,12 +117,12 @@ file YARD_CHECKSUM_FILE => YARD_DOC_FILES do
   sh "yard doc -n #{YARD_SOURCES}"
 end
 
-file "sdl2.rbs" => YARD_CHECKSUM_FILE do
-  sh "sord --no-regenerate --rbs sdl2.rbs"
+file "sdl3.rbs" => YARD_CHECKSUM_FILE do
+  sh "sord --no-regenerate --rbs sdl3.rbs"
 end
 
-file "sdl2.rbi" => YARD_CHECKSUM_FILE do
-  sh "sord --no-regenerate --rbi sdl2.rbi"
+file "sdl3.rbi" => YARD_CHECKSUM_FILE do
+  sh "sord --no-regenerate --rbi sdl3.rbi"
 end
 
 task "clean" do
