@@ -26,35 +26,35 @@ def config(pkg_config, header, libnames)
   have_header(header)
 end
 
-def sdl2config_with_command
-  sdl2_config = with_config('sdl2-config', 'sdl2-config')
-  add_cflags(run_config_program(sdl2_config, "--cflags"))
-  add_libs(run_config_program(sdl2_config, "--libs"))
+def sdl3config_with_command
+  sdl3_config = with_config('sdl2-config', 'sdl2-config') # TODO
+  add_cflags(run_config_program(sdl3_config, "--cflags"))
+  add_libs(run_config_program(sdl3_config, "--libs"))
 end
 
-def sdl2config_on_mingw
+def sdl3config_on_mingw
   have_library("mingw32")
-  have_library("SDL2")
+  have_library("SDL3")
   add_libs("-mwindows")
 end
 
 case RbConfig::CONFIG["arch"]
 when /mingw/
-  sdl2config_on_mingw
+  sdl3config_on_mingw
 else
-  sdl2config_with_command
+  sdl3config_with_command
 end
 
-config("SDL2_image", <SDL3_image/SDL_image.h>, ["SDL2_image", "SDL_image"])
-config("SDL2_mixer", <SDL3_mixer/SDL_mixer.h>, ["SDL2_mixer", "SDL_mixer"])
-config("SDL2_ttf", <SDL3_ttf/SDL_ttf.h>, ["SDL2_ttf", "SDL_ttf"])
-have_header(<SDL3/SDL_filesystem.h>)
+config("SDL3_image", 'SDL3_image/SDL_image.h', ["SDL3_image", "SDL_image"])
+config("SDL3_mixer", 'SDL3_mixer/SDL_mixer.h', ["SDL3_mixer", "SDL_mixer"])
+config("SDL3_ttf", 'SDL3_ttf/SDL_ttf.h', ["SDL3_ttf", "SDL_ttf"])
+have_header('SDL3/SDL_filesystem.h')
 
-have_const("MIX_INIT_MODPLUG", <SDL3_mixer/SDL_mixer.h>)
-have_const("MIX_INIT_FLUIDSYNTH", <SDL3_mixer/SDL_mixer.h>)
-have_const("MIX_INIT_MID", <SDL3_mixer/SDL_mixer.h>)
-have_const("SDL_RENDERER_PRESENTVSYNC", <SDL3/SDL_render.h>)
-have_const("SDL_WINDOW_HIGH_PIXEL_DENSITY", <SDL3/SDL_video.h>)
-have_const("SDL_WINDOW_MOUSE_CAPTURE", <SDL3/SDL_video.h>)
+have_const("MIX_INIT_MODPLUG", 'SDL3_mixer/SDL_mixer.h')
+have_const("MIX_INIT_FLUIDSYNTH", 'SDL3_mixer/SDL_mixer.h')
+have_const("MIX_INIT_MID", 'SDL3_mixer/SDL_mixer.h')
+have_const("SDL_RENDERER_PRESENTVSYNC", 'SDL3/SDL_render.h')
+have_const("SDL_WINDOW_HIGH_PIXEL_DENSITY", 'SDL3/SDL_video.h')
+have_const("SDL_WINDOW_MOUSE_CAPTURE", 'SDL3/SDL_video.h')
 
-create_makefile('sdl2_ext')
+create_makefile('sdl3_ext')
