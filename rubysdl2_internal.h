@@ -28,6 +28,8 @@
 #include <SDL_Version.h>
 #include <SDL3/SDL_video.h>
 
+#include <SDL3/SDL_oldnames.h>
+
 #ifndef SDL2_EXTERN
 #define SDL2_EXTERN extern
 #endif
