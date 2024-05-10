@@ -12,6 +12,7 @@
 #ifdef HAVE_SDL_TTF_H
 #include <SDL3_ttf/SDL_ttf.h>
 #endif
+#include <SDL3/SDL_main.h>
 #include <stdarg.h>
 #include <ruby/encoding.h>
 
@@ -69,6 +70,8 @@ typedef enum {
 } sdl2_state;
 
 static sdl2_state state = NOT_INITIALIZED;
+
+extern void SDL_VideoQuit(void);
 
 static void quit(VALUE unused)
 {
@@ -173,10 +176,10 @@ void Init_sdl2_ext(void)
     DEFINE_SDL_INIT_CONST(VIDEO);
     DEFINE_SDL_INIT_CONST(JOYSTICK);
     DEFINE_SDL_INIT_CONST(HAPTIC);
-    DEFINE_SDL_INIT_CONST(GAMECONTROLLER);
+    DEFINE_SDL_INIT_CONST(GAMEPAD);
     DEFINE_SDL_INIT_CONST(EVENTS);
-    DEFINE_SDL_INIT_CONST(EVERYTHING);
-    DEFINE_SDL_INIT_CONST(NOPARACHUTE);
+    // DEFINE_SDL_INIT_CONST(EVERYTHING);  // Removed.
+    // DEFINE_SDL_INIT_CONST(NOPARACHUTE); // Removed.
 
     /* @return [String] SDL's version string  */
     rb_define_const(mSDL2, "LIBSDL_VERSION", libsdl_version());
