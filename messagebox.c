@@ -175,7 +175,7 @@ static VALUE MessageBox_s_show(VALUE self, VALUE params)
             button_data[i].flags = NUM2INT(flags);
         text = rb_str_export_to_utf8(rb_hash_aref(button, sym_text));
         rb_ary_push(texts, text);
-        button_data[i].buttonid = NUM2INT(rb_hash_aref(button, sym_id));
+        button_data[i].buttonID = NUM2INT(rb_hash_aref(button, sym_id));
         button_data[i].text = StringValueCStr(text);
     }
 
