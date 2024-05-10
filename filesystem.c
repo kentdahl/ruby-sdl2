@@ -1,6 +1,6 @@
 #ifdef HAVE_SDL_FILESYSTEM_H
 #include "rubysdl2_internal.h"
-#include <SDL_filesystem.h>
+#include <SDL3/SDL_filesystem.h>
 
 /*
  * Get the directory where the application was run from.

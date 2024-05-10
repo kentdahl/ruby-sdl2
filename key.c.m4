@@ -1,9 +1,9 @@
 /* -*- C -*- */
 #include "rubysdl2_internal.h"
-#include <SDL_events.h>
-#include <SDL_keyboard.h>
-#include <SDL_keycode.h>
-#include <SDL_scancode.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_keyboard.h>
+#include <SDL3/SDL_keycode.h>
+#include <SDL3/SDL_scancode.h>
 
 static VALUE mKey;
 static VALUE mScan;

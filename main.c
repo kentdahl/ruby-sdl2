@@ -1,16 +1,16 @@
 #define SDL2_EXTERN
 #include "rubysdl2_internal.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <SDL_Version.h>
 #include <stdio.h>
 #ifdef HAVE_SDL_IMAGE_H
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 #endif
 #ifdef HAVE_SDL_MIXER_H
-#include <SDL_mixer.h>
+#include <SDL3_mixer/SDL_mixer.h>
 #endif
 #ifdef HAVE_SDL_TTF_H
-#include <SDL_ttf.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #endif
 #include <stdarg.h>
 #include <ruby/encoding.h>

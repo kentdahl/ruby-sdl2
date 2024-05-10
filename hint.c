@@ -1,5 +1,5 @@
 #include "rubysdl2_internal.h"
-#include <SDL_hints.h>
+#include <SDL3/SDL_hints.h>
 
 static VALUE sym_priority;
 

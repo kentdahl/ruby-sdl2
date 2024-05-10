@@ -45,16 +45,16 @@ else
   sdl2config_with_command
 end
 
-config("SDL2_image", "SDL_image.h", ["SDL2_image", "SDL_image"])
-config("SDL2_mixer", "SDL_mixer.h", ["SDL2_mixer", "SDL_mixer"])
-config("SDL2_ttf", "SDL_ttf.h", ["SDL2_ttf", "SDL_ttf"])
-have_header("SDL_filesystem.h")
+config("SDL2_image", <SDL3_image/SDL_image.h>, ["SDL2_image", "SDL_image"])
+config("SDL2_mixer", <SDL3_mixer/SDL_mixer.h>, ["SDL2_mixer", "SDL_mixer"])
+config("SDL2_ttf", <SDL3_ttf/SDL_ttf.h>, ["SDL2_ttf", "SDL_ttf"])
+have_header(<SDL3/SDL_filesystem.h>)
 
-have_const("MIX_INIT_MODPLUG", "SDL_mixer.h")
-have_const("MIX_INIT_FLUIDSYNTH", "SDL_mixer.h")
-have_const("MIX_INIT_MID", "SDL_mixer.h")
-have_const("SDL_RENDERER_PRESENTVSYNC", "SDL_render.h")
-have_const("SDL_WINDOW_HIGH_PIXEL_DENSITY", "SDL_video.h")
-have_const("SDL_WINDOW_MOUSE_CAPTURE", "SDL_video.h")
+have_const("MIX_INIT_MODPLUG", <SDL3_mixer/SDL_mixer.h>)
+have_const("MIX_INIT_FLUIDSYNTH", <SDL3_mixer/SDL_mixer.h>)
+have_const("MIX_INIT_MID", <SDL3_mixer/SDL_mixer.h>)
+have_const("SDL_RENDERER_PRESENTVSYNC", <SDL3/SDL_render.h>)
+have_const("SDL_WINDOW_HIGH_PIXEL_DENSITY", <SDL3/SDL_video.h>)
+have_const("SDL_WINDOW_MOUSE_CAPTURE", <SDL3/SDL_video.h>)
 
 create_makefile('sdl2_ext')

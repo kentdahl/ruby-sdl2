@@ -1,7 +1,7 @@
 /* -*- mode: C -*- */
 #include "rubysdl2_internal.h"
-#include <SDL_joystick.h>
-#include <SDL_gamecontroller.h>
+#include <SDL3/SDL_joystick.h>
+#include <SDL3/SDL_gamepad.h>
 
 static VALUE cJoystick;
 static VALUE cDeviceInfo;

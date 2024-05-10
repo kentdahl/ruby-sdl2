@@ -1,7 +1,7 @@
 /* -*- mode: C -*- */
 #ifdef HAVE_SDL_MIXER_H
 #include "rubysdl2_internal.h"
-#include <SDL_mixer.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 static VALUE mMixer;
 static VALUE cChunk;

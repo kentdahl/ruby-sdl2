@@ -1,5 +1,5 @@
 #include "rubysdl2_internal.h"
-#include <SDL_messagebox.h>
+#include <SDL3/SDL_messagebox.h>
 
 static VALUE sym_flags, sym_window, sym_title, sym_message, sym_buttons, sym_color_scheme,
     sym_id, sym_text, sym_bg, sym_button_border, sym_button_bg, sym_button_selected;

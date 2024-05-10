@@ -1,10 +1,10 @@
 /* -*- mode: C -*- */
 #include "rubysdl2_internal.h"
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <SDL_Version.h>
-#include <SDL_render.h>
-#include <SDL_messagebox.h>
-#include <SDL_endian.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_messagebox.h>
+#include <SDL3/SDL_endian.h>
 #include <ruby/encoding.h>
 
 static VALUE cWindow;
@@ -3198,7 +3198,7 @@ void rubysdl2_init_video(void)
 }
 
 #ifdef HAVE_SDL_IMAGE_H
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 
 static VALUE mIMG;
 

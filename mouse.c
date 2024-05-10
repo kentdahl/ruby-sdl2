@@ -1,6 +1,6 @@
 #include "rubysdl2_internal.h"
-#include <SDL_mouse.h>
-#include <SDL_events.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_events.h>
 
 static VALUE mMouse;
 static VALUE cCursor;

@@ -1,6 +1,6 @@
 /* -*- mode: C -*- */
 #include "rubysdl2_internal.h"
-#include <SDL_gamecontroller.h>
+#include <SDL3/SDL_gamepad.h>
 
 static VALUE cGameController;
 static VALUE mAxis;

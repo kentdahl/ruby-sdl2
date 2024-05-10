@@ -1,5 +1,5 @@
 #include "rubysdl2_internal.h"
-#include <SDL_clipboard.h>
+#include <SDL3/SDL_clipboard.h>
 
 /*
  * Document-module: SDL2::Clipboard
