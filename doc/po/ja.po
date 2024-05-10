@@ -1182,7 +1182,7 @@ msgstr ""
 #: ../../gamecontroller.c:100
 msgid ""
 "\"GUID,name,mapping\", where GUID is\n"
-"the string value from SDL_JoystickGetGUIDString(), name is the human\n"
+"the string value from SDL_GetJoystickGUIDString(), name is the human\n"
 "readable string for the device and mappings are controller mappings to\n"
 "joystick ones. Under Windows there is a reserved GUID of \"xinput\" that\n"
 "covers all XInput devices. The mapping format for joystick is:"

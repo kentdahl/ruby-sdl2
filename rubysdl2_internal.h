@@ -25,7 +25,7 @@
 #include <ruby/encoding.h>
 #define SDL_MAIN_HANDLED
 #include <SDL_surface.h>
-#include <SDL_version.h>
+#include <SDL_Version.h>
 #include <SDL_video.h>
 
 #ifndef SDL2_EXTERN
@@ -39,8 +39,8 @@ void rubysdl2_define_attr_readers(VALUE klass, ...);
 VALUE rubysdl2_utf8str_new_cstr(const char* str);
 VALUE rubysdl2_Surface_new(SDL_Surface* surface);
 SDL_Color rubysdl2_Array_to_SDL_Color(VALUE ary);
-VALUE rubysdl2_SDL_version_to_String(const SDL_version* ver);
-VALUE rubysdl2_SDL_version_to_Array(const SDL_version* ver);
+VALUE rubysdl2_SDL_version_to_String(const SDL_Version* ver);
+VALUE rubysdl2_SDL_version_to_Array(const SDL_Version* ver);
 VALUE rubysdl2_find_window_by_id(Uint32 id);
 SDL_Rect* rubysdl2_Get_SDL_Rect(VALUE);
 SDL_Window* rubysdl2_Get_SDL_Window(VALUE);

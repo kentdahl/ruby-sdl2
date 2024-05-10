@@ -1,6 +1,6 @@
 #include "rubysdl2_internal.h"
 #include <SDL_events.h>
-#include <SDL_version.h>
+#include <SDL_Version.h>
 
 static VALUE cEvent;
 static VALUE cEvQuit;
@@ -54,7 +54,7 @@ static VALUE cEvFingerMotion;
    SDL_UserEvent, SDL_RegisterEvents
  */
 
-static VALUE event_type_to_class[SDL_LASTEVENT];
+static VALUE event_type_to_class[SDL_EVENT_LAST];
 
 /*
  * Document-class: SDL2::Event
@@ -820,7 +820,7 @@ static VALUE ControllerAxis_inspect(VALUE self)
     return rb_sprintf("<%s: type=%u timestamp=%u"
                       " which=%d axis=%s value=%d>",
                       rb_obj_classname(self), ev->common.type, ev->common.timestamp,
-                      ev->caxis.which, SDL_GameControllerGetStringForAxis(ev->caxis.axis),
+                      ev->caxis.which, SDL_GetGamepadStringForAxis(ev->caxis.axis),
                       ev->caxis.value);
 }
 
@@ -858,7 +858,7 @@ static VALUE ControllerButton_inspect(VALUE self)
                       " which=%d button=%s state=%s>",
                       rb_obj_classname(self), ev->common.type, ev->common.timestamp,
                       ev->cbutton.which,
-                      SDL_GameControllerGetStringForButton(ev->cbutton.button),
+                      SDL_GetGamepadStringForButton(ev->cbutton.button),
                       INT2BOOLCSTR(ev->cbutton.state));
 }
 /*
@@ -1021,35 +1021,35 @@ static void connect_event_class(SDL_EventType type, VALUE klass)
 static void init_event_type_to_class(void)
 {
     int i;
-    for (i=0; i<SDL_LASTEVENT; ++i)
+    for (i=0; i<SDL_EVENT_LAST; ++i)
         event_type_to_class[i] = cEvent;
     
-    connect_event_class(SDL_QUIT, cEvQuit);
+    connect_event_class(SDL_EVENT_QUIT, cEvQuit);
     connect_event_class(SDL_WINDOWEVENT, cEvWindow);
-    connect_event_class(SDL_KEYDOWN, cEvKeyDown);
-    connect_event_class(SDL_KEYUP, cEvKeyUp);
-    connect_event_class(SDL_TEXTEDITING, cEvTextEditing);
-    connect_event_class(SDL_TEXTINPUT, cEvTextInput);
-    connect_event_class(SDL_MOUSEBUTTONDOWN, cEvMouseButtonDown);
-    connect_event_class(SDL_MOUSEBUTTONUP, cEvMouseButtonUp);
-    connect_event_class(SDL_MOUSEMOTION, cEvMouseMotion);
-    connect_event_class(SDL_MOUSEWHEEL, cEvMouseWheel);
-    connect_event_class(SDL_JOYBUTTONDOWN, cEvJoyButtonDown);
-    connect_event_class(SDL_JOYBUTTONUP, cEvJoyButtonUp);
-    connect_event_class(SDL_JOYAXISMOTION, cEvJoyAxisMotion);
-    connect_event_class(SDL_JOYBALLMOTION, cEvJoyBallMotion);
-    connect_event_class(SDL_JOYDEVICEADDED, cEvJoyDeviceAdded);
-    connect_event_class(SDL_JOYDEVICEREMOVED, cEvJoyDeviceRemoved);
-    connect_event_class(SDL_JOYHATMOTION, cEvJoyHatMotion);
-    connect_event_class(SDL_CONTROLLERAXISMOTION, cEvControllerAxisMotion);
-    connect_event_class(SDL_CONTROLLERBUTTONDOWN, cEvControllerButtonDown);
-    connect_event_class(SDL_CONTROLLERBUTTONUP, cEvControllerButtonUp);
-    connect_event_class(SDL_CONTROLLERDEVICEADDED, cEvControllerDeviceAdded);
-    connect_event_class(SDL_CONTROLLERDEVICEREMOVED, cEvControllerDeviceRemoved);
-    connect_event_class(SDL_CONTROLLERDEVICEREMAPPED, cEvControllerDeviceRemapped);
-    connect_event_class(SDL_FINGERDOWN, cEvFingerDown);
-    connect_event_class(SDL_FINGERUP, cEvFingerUp);
-    connect_event_class(SDL_FINGERMOTION, cEvFingerMotion);
+    connect_event_class(SDL_EVENT_KEY_DOWN, cEvKeyDown);
+    connect_event_class(SDL_EVENT_KEY_UP, cEvKeyUp);
+    connect_event_class(SDL_EVENT_TEXT_EDITING, cEvTextEditing);
+    connect_event_class(SDL_EVENT_TEXT_INPUT, cEvTextInput);
+    connect_event_class(SDL_EVENT_MOUSE_BUTTON_DOWN, cEvMouseButtonDown);
+    connect_event_class(SDL_EVENT_MOUSE_BUTTON_UP, cEvMouseButtonUp);
+    connect_event_class(SDL_EVENT_MOUSE_MOTION, cEvMouseMotion);
+    connect_event_class(SDL_EVENT_MOUSE_WHEEL, cEvMouseWheel);
+    connect_event_class(SDL_EVENT_JOYSTICK_BUTTON_DOWN, cEvJoyButtonDown);
+    connect_event_class(SDL_EVENT_JOYSTICK_BUTTON_UP, cEvJoyButtonUp);
+    connect_event_class(SDL_EVENT_JOYSTICK_AXIS_MOTION, cEvJoyAxisMotion);
+    connect_event_class(SDL_EVENT_JOYSTICK_BALL_MOTION, cEvJoyBallMotion);
+    connect_event_class(SDL_EVENT_JOYSTICK_ADDED, cEvJoyDeviceAdded);
+    connect_event_class(SDL_EVENT_JOYSTICK_REMOVED, cEvJoyDeviceRemoved);
+    connect_event_class(SDL_EVENT_JOYSTICK_HAT_MOTION, cEvJoyHatMotion);
+    connect_event_class(SDL_EVENT_GAMEPAD_AXIS_MOTION, cEvControllerAxisMotion);
+    connect_event_class(SDL_EVENT_GAMEPAD_BUTTON_DOWN, cEvControllerButtonDown);
+    connect_event_class(SDL_EVENT_GAMEPAD_BUTTON_UP, cEvControllerButtonUp);
+    connect_event_class(SDL_EVENT_GAMEPAD_ADDED, cEvControllerDeviceAdded);
+    connect_event_class(SDL_EVENT_GAMEPAD_REMOVED, cEvControllerDeviceRemoved);
+    connect_event_class(SDL_EVENT_GAMEPAD_REMAPPED, cEvControllerDeviceRemapped);
+    connect_event_class(SDL_EVENT_FINGER_DOWN, cEvFingerDown);
+    connect_event_class(SDL_EVENT_FINGER_UP, cEvFingerUp);
+    connect_event_class(SDL_EVENT_FINGER_MOTION, cEvFingerMotion);
 }
 
 #define DEFINE_EVENT_READER(classname, classvar, name)                  \

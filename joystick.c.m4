@@ -14,7 +14,7 @@ typedef struct Joystick {
 static void Joystick_free(Joystick* j)
 {
     if (rubysdl2_is_active() && j->joystick)
-        SDL_JoystickClose(j->joystick);
+        SDL_CloseJoystick(j->joystick);
     free(j);
 }
 
@@ -53,7 +53,7 @@ static VALUE Joystick_s_num_connected_joysticks(VALUE self)
 static VALUE GUID_to_String(SDL_JoystickGUID guid)
 {
     char buf[128];
-    SDL_JoystickGetGUIDString(guid, buf, sizeof(buf));
+    SDL_GetJoystickGUIDString(guid, buf, sizeof(buf));
     return rb_usascii_str_new_cstr(buf);
 }
 
@@ -87,7 +87,7 @@ static VALUE Joystick_s_devices(VALUE self)
  */
 static VALUE Joystick_s_open(VALUE self, VALUE device_index)
 {
-    SDL_Joystick* joystick = SDL_JoystickOpen(NUM2INT(device_index));
+    SDL_Joystick* joystick = SDL_OpenJoystick(NUM2INT(device_index));
     if (!joystick)
         SDL_ERROR();
     return Joystick_new(joystick);
@@ -105,7 +105,7 @@ static VALUE Joystick_s_open(VALUE self, VALUE device_index)
  */
 static VALUE Joystick_s_game_controller_p(VALUE self, VALUE index)
 {
-    return INT2BOOL(SDL_IsGameController(NUM2INT(index)));
+    return INT2BOOL(SDL_IsGamepad(NUM2INT(index)));
 }
 
 /*
@@ -116,7 +116,7 @@ static VALUE Joystick_attached_p(VALUE self)
     Joystick* j = Get_Joystick(self);
     if (!j->joystick)
         return Qfalse;
-    return INT2BOOL(SDL_JoystickGetAttached(j->joystick));
+    return INT2BOOL(SDL_JoystickConnected(j->joystick));
 }
 
 /*
@@ -128,8 +128,8 @@ static VALUE Joystick_GUID(VALUE self)
 {
     SDL_JoystickGUID guid;
     char buf[128];
-    guid = SDL_JoystickGetGUID(Get_SDL_Joystick(self));
-    SDL_JoystickGetGUIDString(guid, buf, sizeof(buf));
+    guid = SDL_GetJoystickGUID(Get_SDL_Joystick(self));
+    SDL_GetJoystickGUIDString(guid, buf, sizeof(buf));
     return rb_usascii_str_new_cstr(buf);
 }
 
@@ -140,7 +140,7 @@ static VALUE Joystick_GUID(VALUE self)
  */
 static VALUE Joystick_index(VALUE self)
 {
-    return INT2NUM(HANDLE_ERROR(SDL_JoystickInstanceID(Get_SDL_Joystick(self))));
+    return INT2NUM(HANDLE_ERROR(SDL_GetJoystickInstanceID(Get_SDL_Joystick(self))));
 }
 
 /*
@@ -153,7 +153,7 @@ static VALUE Joystick_destroy(VALUE self)
 {
     Joystick* j = Get_Joystick(self);
     if (j->joystick)
-        SDL_JoystickClose(j->joystick);
+        SDL_CloseJoystick(j->joystick);
     j->joystick = NULL;
     return Qnil;
 }
@@ -165,7 +165,7 @@ static VALUE Joystick_destroy(VALUE self)
  */
 static VALUE Joystick_name(VALUE self)
 {
-    return utf8str_new_cstr(SDL_JoystickName(Get_SDL_Joystick(self)));
+    return utf8str_new_cstr(SDL_GetJoystickName(Get_SDL_Joystick(self)));
 }
 
 /*
@@ -175,7 +175,7 @@ static VALUE Joystick_name(VALUE self)
  */
 static VALUE Joystick_num_axes(VALUE self)
 {
-    return INT2FIX(SDL_JoystickNumAxes(Get_SDL_Joystick(self)));
+    return INT2FIX(SDL_GetNumJoystickAxes(Get_SDL_Joystick(self)));
 }
 
 /*
@@ -185,7 +185,7 @@ static VALUE Joystick_num_axes(VALUE self)
  */
 static VALUE Joystick_num_balls(VALUE self)
 {
-    return INT2FIX(SDL_JoystickNumBalls(Get_SDL_Joystick(self)));
+    return INT2FIX(SDL_GetNumJoystickBalls(Get_SDL_Joystick(self)));
 }
 
 /*
@@ -195,7 +195,7 @@ static VALUE Joystick_num_balls(VALUE self)
  */
 static VALUE Joystick_num_buttons(VALUE self)
 {
-    return INT2FIX(SDL_JoystickNumButtons(Get_SDL_Joystick(self)));
+    return INT2FIX(SDL_GetNumJoystickButtons(Get_SDL_Joystick(self)));
 }
 
 /*
@@ -205,7 +205,7 @@ static VALUE Joystick_num_buttons(VALUE self)
  */
 static VALUE Joystick_num_hats(VALUE self)
 {
-    return INT2FIX(SDL_JoystickNumHats(Get_SDL_Joystick(self)));
+    return INT2FIX(SDL_GetNumJoystickHats(Get_SDL_Joystick(self)));
 }
 
 /*
@@ -218,7 +218,7 @@ static VALUE Joystick_num_hats(VALUE self)
  */
 static VALUE Joystick_axis(VALUE self, VALUE which)
 {
-    return INT2FIX(SDL_JoystickGetAxis(Get_SDL_Joystick(self), NUM2INT(which)));
+    return INT2FIX(SDL_GetJoystickAxis(Get_SDL_Joystick(self), NUM2INT(which)));
 }
 
 /*
@@ -232,7 +232,7 @@ static VALUE Joystick_axis(VALUE self, VALUE which)
 static VALUE Joystick_ball(VALUE self, VALUE which)
 {
     int dx, dy;
-    HANDLE_ERROR(SDL_JoystickGetBall(Get_SDL_Joystick(self), NUM2INT(which), &dx, &dy));
+    HANDLE_ERROR(SDL_GetJoystickBall(Get_SDL_Joystick(self), NUM2INT(which), &dx, &dy));
     return rb_ary_new3(2, INT2NUM(dx), INT2NUM(dy));
 }
 
@@ -246,7 +246,7 @@ static VALUE Joystick_ball(VALUE self, VALUE which)
  */
 static VALUE Joystick_button(VALUE self, VALUE which)
 {
-    return INT2BOOL(SDL_JoystickGetButton(Get_SDL_Joystick(self), NUM2INT(which)));
+    return INT2BOOL(SDL_GetJoystickButton(Get_SDL_Joystick(self), NUM2INT(which)));
 }
 
 /*
@@ -259,7 +259,7 @@ static VALUE Joystick_button(VALUE self, VALUE which)
  */
 static VALUE Joystick_hat(VALUE self, VALUE which)
 {
-    return UINT2NUM(SDL_JoystickGetHat(Get_SDL_Joystick(self), NUM2INT(which)));
+    return UINT2NUM(SDL_GetJoystickHat(Get_SDL_Joystick(self), NUM2INT(which)));
 }
 
 /*

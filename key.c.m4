@@ -190,7 +190,7 @@ static VALUE Mod_s_set_state(VALUE self, VALUE keymod)
  */
 static VALUE TextInput_s_active_p(VALUE self)
 {
-    return INT2BOOL(SDL_IsTextInputActive());
+    return INT2BOOL(SDL_TextInputActive());
 }
 
 /*

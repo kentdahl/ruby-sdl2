@@ -7,13 +7,13 @@ static VALUE mAxis;
 static VALUE mButton;
 
 typedef struct GameController {
-    SDL_GameController* controller;
+    SDL_Gamepad* controller;
 } GameController;
 
 static void GameController_free(GameController* g)
 {
     if (rubysdl2_is_active() && g->controller)
-        SDL_GameControllerClose(g->controller);
+        SDL_CloseGamepad(g->controller);
     free(g);
 }
 
@@ -58,14 +58,14 @@ static void GameController_free(GameController* g)
  *   Return true if the gamecontroller is already closed.
  */
 
-static VALUE GameController_new(SDL_GameController* controller)
+static VALUE GameController_new(SDL_Gamepad* controller)
 {
     GameController* g = ALLOC(GameController);
     g->controller = controller;
     return Data_Wrap_Struct(cGameController, 0, GameController_free, g);
 }
 
-DEFINE_WRAPPER(SDL_GameController, GameController, controller, cGameController,
+DEFINE_WRAPPER(SDL_Gamepad, GameController, controller, cGameController,
                "SDL2::GameController");
 
 
@@ -76,7 +76,7 @@ DEFINE_WRAPPER(SDL_GameController, GameController, controller, cGameController,
  *   existing controller to have a different binding.
  *
  *   "GUID,name,mapping", where GUID is
- *   the string value from SDL_JoystickGetGUIDString(), name is the human
+ *   the string value from SDL_GetJoystickGUIDString(), name is the human
  *   readable string for the device and mappings are controller mappings to
  *   joystick ones. Under Windows there is a reserved GUID of "xinput" that
  *   covers all XInput devices. The mapping format for joystick is:
@@ -95,7 +95,7 @@ DEFINE_WRAPPER(SDL_GameController, GameController, controller, cGameController,
  */
 static VALUE GameController_s_add_mapping(VALUE self, VALUE string)
 {
-    int ret = HANDLE_ERROR(SDL_GameControllerAddMapping(StringValueCStr(string)));
+    int ret = HANDLE_ERROR(SDL_AddGamepadMapping(StringValueCStr(string)));
     return INT2NUM(ret);
 }
 
@@ -109,7 +109,7 @@ static VALUE GameController_s_add_mapping(VALUE self, VALUE string)
  */
 static VALUE GameController_s_axis_name_of(VALUE self, VALUE axis)
 {
-    const char* name = SDL_GameControllerGetStringForAxis(NUM2INT(axis));
+    const char* name = SDL_GetGamepadStringForAxis(NUM2INT(axis));
     if (!name) {
         SDL_SetError("Unknown axis %d", NUM2INT(axis));
         SDL_ERROR();
@@ -127,7 +127,7 @@ static VALUE GameController_s_axis_name_of(VALUE self, VALUE axis)
  */
 static VALUE GameController_s_button_name_of(VALUE self, VALUE button)
 {
-    const char* name = SDL_GameControllerGetStringForButton(NUM2INT(button));
+    const char* name = SDL_GetGamepadStringForButton(NUM2INT(button));
     if (!name) {
         SDL_SetError("Unknown axis %d", NUM2INT(button));
         SDL_ERROR();
@@ -148,7 +148,7 @@ static VALUE GameController_s_button_name_of(VALUE self, VALUE button)
  */
 static VALUE GameController_s_axis_from_name(VALUE self, VALUE name)
 {
-    int axis = SDL_GameControllerGetAxisFromString(StringValueCStr(name));
+    int axis = SDL_GetGamepadAxisFromString(StringValueCStr(name));
     if (axis < 0) {
         SDL_SetError("Unknown axis name \"%s\"", StringValueCStr(name));
         SDL_ERROR();
@@ -169,7 +169,7 @@ static VALUE GameController_s_axis_from_name(VALUE self, VALUE name)
  */
 static VALUE GameController_s_button_from_name(VALUE self, VALUE name)
 {
-    int button = SDL_GameControllerGetButtonFromString(StringValueCStr(name));
+    int button = SDL_GetGamepadButtonFromString(StringValueCStr(name));
     if (button < 0) {
         SDL_SetError("Unknown button name \"%s\"", StringValueCStr(name));
         SDL_ERROR();
@@ -211,8 +211,8 @@ static VALUE GameController_s_device_names(VALUE self)
  */
 static VALUE GameController_s_mapping_for(VALUE self, VALUE guid_string)
 {
-    SDL_JoystickGUID guid = SDL_JoystickGetGUIDFromString(StringValueCStr(guid_string));
-    return utf8str_new_cstr(SDL_GameControllerMappingForGUID(guid));
+    SDL_JoystickGUID guid = SDL_GetJoystickGUIDFromString(StringValueCStr(guid_string));
+    return utf8str_new_cstr(SDL_GetGamepadMappingForGUID(guid));
 }
 
 /*
@@ -227,7 +227,7 @@ static VALUE GameController_s_mapping_for(VALUE self, VALUE guid_string)
  */
 static VALUE GameController_s_open(VALUE self, VALUE index)
 {
-    SDL_GameController* controller = SDL_GameControllerOpen(NUM2INT(index));
+    SDL_Gamepad* controller = SDL_OpenGamepad(NUM2INT(index));
     if (!controller)
         SDL_ERROR();
     return GameController_new(controller);
@@ -240,7 +240,7 @@ static VALUE GameController_s_open(VALUE self, VALUE index)
  */
 static VALUE GameController_name(VALUE self)
 {
-    const char* name = SDL_GameControllerName(Get_SDL_GameController(self));
+    const char* name = SDL_GetGamepadName(Get_SDL_GameController(self));
     if (!name)
         SDL_ERROR();
 
@@ -252,7 +252,7 @@ static VALUE GameController_name(VALUE self)
  */
 static VALUE GameController_attached_p(VALUE self)
 {
-    return INT2BOOL(SDL_GameControllerGetAttached(Get_SDL_GameController(self)));
+    return INT2BOOL(SDL_GamepadConnected(Get_SDL_GameController(self)));
 }
 
 /*
@@ -264,7 +264,7 @@ static VALUE GameController_destroy(VALUE self)
 {
     GameController* g = Get_GameController(self);
     if (g->controller)
-        SDL_GameControllerClose(g->controller);
+        SDL_CloseGamepad(g->controller);
     g->controller = NULL;
     return Qnil;
 }
@@ -278,7 +278,7 @@ static VALUE GameController_destroy(VALUE self)
  */
 static VALUE GameController_mapping(VALUE self)
 {
-    return utf8str_new_cstr(SDL_GameControllerMapping(Get_SDL_GameController(self)));
+    return utf8str_new_cstr(SDL_GetGamepadMapping(Get_SDL_GameController(self)));
 }
 
 /*
@@ -293,7 +293,7 @@ static VALUE GameController_mapping(VALUE self)
  */
 static VALUE GameController_axis(VALUE self, VALUE axis)
 {
-    return INT2FIX(SDL_GameControllerGetAxis(Get_SDL_GameController(self),
+    return INT2FIX(SDL_GetGamepadAxis(Get_SDL_GameController(self),
                                              NUM2INT(axis)));
 }
 
@@ -306,7 +306,7 @@ static VALUE GameController_axis(VALUE self, VALUE axis)
  */
 static VALUE GameController_button_pressed_p(VALUE self, VALUE button)
 {
-    return INT2BOOL(SDL_GameControllerGetButton(Get_SDL_GameController(self),
+    return INT2BOOL(SDL_GetGamepadButton(Get_SDL_GameController(self),
                                                 NUM2INT(button)));
 }
 

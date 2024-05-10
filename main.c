@@ -1,7 +1,7 @@
 #define SDL2_EXTERN
 #include "rubysdl2_internal.h"
 #include <SDL.h>
-#include <SDL_version.h>
+#include <SDL_Version.h>
 #include <stdio.h>
 #ifdef HAVE_SDL_IMAGE_H
 #include <SDL_image.h>
@@ -49,12 +49,12 @@ VALUE utf8str_new_cstr(const char* str)
     return rb_enc_str_new(str, strlen(str), rb_utf8_encoding());
 }
 
-VALUE SDL_version_to_String(const SDL_version* ver)
+VALUE SDL_version_to_String(const SDL_Version* ver)
 {
     return rb_sprintf("%d.%d.%d", ver->major, ver->minor, ver->patch);
 }
 
-VALUE SDL_version_to_Array(const SDL_version* ver)
+VALUE SDL_version_to_Array(const SDL_Version* ver)
 {
     return rb_ary_new3(3, INT2FIX(ver->major), INT2FIX(ver->minor), INT2FIX(ver->patch));
 }
@@ -128,14 +128,14 @@ int rubysdl2_is_active(void)
 
 static VALUE libsdl_version(void)
 {
-    SDL_version version;
+    SDL_Version version;
     SDL_GetVersion(&version);
     return SDL_version_to_String(&version);
 }
 
 static VALUE libsdl_version_number(void)
 {
-    SDL_version version;
+    SDL_Version version;
     SDL_GetVersion(&version);
     return SDL_version_to_Array(&version);
 }
@@ -191,7 +191,7 @@ void Init_sdl2_ext(void)
 
 #ifdef HAVE_SDL_IMAGE_H
     {
-        const SDL_version* version = IMG_Linked_Version();
+        const SDL_Version* version = IMG_Linked_Version();
         /* @return [String] SDL_image's version string, only available if SDL_image is linked */
         rb_define_const(mSDL2, "LIBSDL_IMAGE_VERSION", SDL_version_to_String(version));
         /* @return [Array(Integer, Integer, Integer)] SDL_image's version array of numbers */
@@ -200,7 +200,7 @@ void Init_sdl2_ext(void)
 #endif
 #ifdef HAVE_SDL_TTF_H
     {
-        const SDL_version* version = TTF_Linked_Version();
+        const SDL_Version* version = TTF_Linked_Version();
         /* @return [String] SDL_ttf's version string, only available if SDL_ttf is linked */
         rb_define_const(mSDL2, "LIBSDL_TTF_VERSION", SDL_version_to_String(version));
         /* @return [Array(Integer, Integer, Integer)] SDL_ttf's version array of numbers */
@@ -209,7 +209,7 @@ void Init_sdl2_ext(void)
 #endif
 #ifdef HAVE_SDL_MIXER_H
     {
-        const SDL_version* version = Mix_Linked_Version();
+        const SDL_Version* version = Mix_Linked_Version();
         /* @return [Integer] SDL_mixer's version string , only available if SDL_mixer is linked */
         rb_define_const(mSDL2, "LIBSDL_MIXER_VERSION", SDL_version_to_String(version));
         /* @return [Array(Integer, Integer, Integer)] SDL_mixer's version array of numbers */

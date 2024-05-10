@@ -1,7 +1,7 @@
 /* -*- mode: C -*- */
 #include "rubysdl2_internal.h"
 #include <SDL_video.h>
-#include <SDL_version.h>
+#include <SDL_Version.h>
 #include <SDL_render.h>
 #include <SDL_messagebox.h>
 #include <SDL_endian.h>
@@ -225,7 +225,7 @@ static void Surface_free(Surface* s)
     if (s->need_to_free_pixels)
         free(s->surface->pixels);
     if (s->surface && rubysdl2_is_active())
-        SDL_FreeSurface(s->surface);
+        SDL_DestroySurface(s->surface);
     free(s);
 }
 
@@ -488,7 +488,7 @@ static VALUE Window_window_id(VALUE self)
 static VALUE Window_display_mode(VALUE self)
 {
     SDL_DisplayMode mode;
-    HANDLE_ERROR(SDL_GetWindowDisplayMode(Get_SDL_Window(self), &mode));
+    HANDLE_ERROR(SDL_GetWindowFullscreenMode(Get_SDL_Window(self), &mode));
     return DisplayMode_new(&mode);
 }
 
@@ -499,7 +499,7 @@ static VALUE Window_display_mode(VALUE self)
  */
 static VALUE Window_display(VALUE self)
 {
-    int display_index = HANDLE_ERROR(SDL_GetWindowDisplayIndex(Get_SDL_Window(self)));
+    int display_index = HANDLE_ERROR(SDL_GetDisplayForWindow(Get_SDL_Window(self)));
     return Display_new(display_index);
 }
 
@@ -1051,7 +1051,7 @@ static VALUE Display_desktop_mode(VALUE self)
 static VALUE Display_closest_mode(VALUE self, VALUE mode)
 {
     SDL_DisplayMode closest;
-    if (!SDL_GetClosestDisplayMode(Display_index_int(self), Get_SDL_DisplayMode(mode),
+    if (!SDL_GetClosestFullscreenDisplayMode(Display_index_int(self), Get_SDL_DisplayMode(mode),
                                    &closest))
         SDL_ERROR();
     return DisplayMode_new(&closest);
@@ -1266,7 +1266,7 @@ static SDL_Point* Get_SDL_Point_or_NULL(VALUE point)
  */
 static VALUE Renderer_copy(VALUE self, VALUE texture, VALUE srcrect, VALUE dstrect)
 {
-    HANDLE_ERROR(SDL_RenderCopy(Get_SDL_Renderer(self),
+    HANDLE_ERROR(SDL_RenderTexture(Get_SDL_Renderer(self),
                                 Get_SDL_Texture(texture),
                                 Get_SDL_Rect_or_NULL(srcrect),
                                 Get_SDL_Rect_or_NULL(dstrect)));
@@ -1303,7 +1303,7 @@ static VALUE Renderer_copy(VALUE self, VALUE texture, VALUE srcrect, VALUE dstre
 static VALUE Renderer_copy_ex(VALUE self, VALUE texture, VALUE srcrect, VALUE dstrect,
                               VALUE angle, VALUE center, VALUE flip)
 {
-    HANDLE_ERROR(SDL_RenderCopyEx(Get_SDL_Renderer(self),
+    HANDLE_ERROR(SDL_RenderTextureRotated(Get_SDL_Renderer(self),
                                   Get_SDL_Texture(texture),
                                   Get_SDL_Rect_or_NULL(srcrect),
                                   Get_SDL_Rect_or_NULL(dstrect),
@@ -1395,7 +1395,7 @@ static VALUE Renderer_set_draw_color(VALUE self, VALUE rgba)
  */
 static VALUE Renderer_draw_line(VALUE self, VALUE x1, VALUE y1, VALUE x2, VALUE y2)
 {
-    HANDLE_ERROR(SDL_RenderDrawLine(Get_SDL_Renderer(self),
+    HANDLE_ERROR(SDL_RenderLine(Get_SDL_Renderer(self),
                                     NUM2INT(x1), NUM2INT(y1), NUM2INT(x2), NUM2INT(y2)));
     return Qnil;
 }
@@ -1411,7 +1411,7 @@ static VALUE Renderer_draw_line(VALUE self, VALUE x1, VALUE y1, VALUE x2, VALUE 
  */
 static VALUE Renderer_draw_point(VALUE self, VALUE x, VALUE y)
 {
-    HANDLE_ERROR(SDL_RenderDrawPoint(Get_SDL_Renderer(self), NUM2INT(x), NUM2INT(y)));
+    HANDLE_ERROR(SDL_RenderPoint(Get_SDL_Renderer(self), NUM2INT(x), NUM2INT(y)));
     return Qnil;
 }
 
@@ -1425,7 +1425,7 @@ static VALUE Renderer_draw_point(VALUE self, VALUE x, VALUE y)
  */
 static VALUE Renderer_draw_rect(VALUE self, VALUE rect)
 {
-    HANDLE_ERROR(SDL_RenderDrawRect(Get_SDL_Renderer(self), Get_SDL_Rect(rect)));
+    HANDLE_ERROR(SDL_RenderRect(Get_SDL_Renderer(self), Get_SDL_Rect(rect)));
     return Qnil;
 }
 
@@ -1504,7 +1504,7 @@ static VALUE Renderer_set_draw_blend_mode(VALUE self, VALUE mode)
 static VALUE Renderer_clip_rect(VALUE self)
 {
     VALUE rect = rb_obj_alloc(cRect);
-    SDL_RenderGetClipRect(Get_SDL_Renderer(self), Get_SDL_Rect(rect));
+    SDL_GetRenderClipRect(Get_SDL_Renderer(self), Get_SDL_Rect(rect));
     return rect;
 }
 
@@ -1519,7 +1519,7 @@ static VALUE Renderer_clip_rect(VALUE self)
  */
 static VALUE Renderer_set_clip_rect(VALUE self, VALUE rect)
 {
-    HANDLE_ERROR(SDL_RenderSetClipRect(Get_SDL_Renderer(self), Get_SDL_Rect(rect)));
+    HANDLE_ERROR(SDL_SetRenderClipRect(Get_SDL_Renderer(self), Get_SDL_Rect(rect)));
     return rect;
 }
 
@@ -1531,7 +1531,7 @@ static VALUE Renderer_set_clip_rect(VALUE self, VALUE rect)
  */
 static VALUE Render_clip_enabled_p(VALUE self)
 {
-    return INT2BOOL(SDL_RenderIsClipEnabled(Get_SDL_Renderer(self)));
+    return INT2BOOL(SDL_RenderClipEnabled(Get_SDL_Renderer(self)));
 }
 #endif
 
@@ -1544,7 +1544,7 @@ static VALUE Render_clip_enabled_p(VALUE self)
 static VALUE Renderer_logical_size(VALUE self)
 {
     int w, h;
-    SDL_RenderGetLogicalSize(Get_SDL_Renderer(self), &w, &h);
+    SDL_GetRenderLogicalPresentation(Get_SDL_Renderer(self), &w, &h);
     return rb_ary_new3(2, INT2FIX(w), INT2FIX(h));
 }
 
@@ -1559,7 +1559,7 @@ static VALUE Renderer_logical_size(VALUE self)
  */
 static VALUE Renderer_set_logical_size(VALUE self, VALUE wh)
 {
-    HANDLE_ERROR(SDL_RenderSetLogicalSize(Get_SDL_Renderer(self),
+    HANDLE_ERROR(SDL_SetRenderLogicalPresentation(Get_SDL_Renderer(self),
                                           NUM2DBL(rb_ary_entry(wh, 0)),
                                           NUM2DBL(rb_ary_entry(wh, 1))));
     return wh;
@@ -1574,7 +1574,7 @@ static VALUE Renderer_set_logical_size(VALUE self, VALUE wh)
 static VALUE Renderer_scale(VALUE self)
 {
     float scaleX, scaleY;
-    SDL_RenderGetScale(Get_SDL_Renderer(self), &scaleX, &scaleY);
+    SDL_GetRenderScale(Get_SDL_Renderer(self), &scaleX, &scaleY);
     return rb_ary_new3(2, DBL2NUM(scaleX), DBL2NUM(scaleY));
 }
 
@@ -1599,7 +1599,7 @@ static VALUE Renderer_set_scale(VALUE self, VALUE xy)
     float scaleX, scaleY;
     scaleX = NUM2DBL(rb_ary_entry(xy, 0));
     scaleY = NUM2DBL(rb_ary_entry(xy, 1));
-    HANDLE_ERROR(SDL_RenderSetScale(Get_SDL_Renderer(self), scaleX, scaleY));
+    HANDLE_ERROR(SDL_SetRenderScale(Get_SDL_Renderer(self), scaleX, scaleY));
     return xy;
 }
 
@@ -1612,7 +1612,7 @@ static VALUE Renderer_set_scale(VALUE self, VALUE xy)
 static VALUE Renderer_viewport(VALUE self)
 {
     VALUE rect = rb_obj_alloc(cRect);
-    SDL_RenderGetViewport(Get_SDL_Renderer(self), Get_SDL_Rect(rect));
+    SDL_GetRenderViewport(Get_SDL_Renderer(self), Get_SDL_Rect(rect));
     return rect;
 }
 
@@ -1626,7 +1626,7 @@ static VALUE Renderer_viewport(VALUE self)
  */
 static VALUE Renderer_set_viewport(VALUE self, VALUE rect)
 {
-    HANDLE_ERROR(SDL_RenderSetViewport(Get_SDL_Renderer(self), Get_SDL_Rect_or_NULL(rect)));
+    HANDLE_ERROR(SDL_SetRenderViewport(Get_SDL_Renderer(self), Get_SDL_Rect_or_NULL(rect)));
     return rect;
 }
 
@@ -1648,7 +1648,7 @@ static VALUE Renderer_support_render_target_p(VALUE self)
 static VALUE Renderer_output_size(VALUE self)
 {
     int w, h;
-    HANDLE_ERROR(SDL_GetRendererOutputSize(Get_SDL_Renderer(self), &w, &h));
+    HANDLE_ERROR(SDL_GetCurrentRenderOutputSize(Get_SDL_Renderer(self), &w, &h));
     return rb_ary_new3(2, INT2FIX(w), INT2FIX(h));
 }
 
@@ -2093,7 +2093,7 @@ static VALUE Surface_destroy(VALUE self)
         free(s->surface->pixels);
     s->need_to_free_pixels = 0;
     if (s->surface)
-        SDL_FreeSurface(s->surface);
+        SDL_DestroySurface(s->surface);
     s->surface = NULL;
     return Qnil;
 }
@@ -2291,7 +2291,7 @@ static Uint32 pixel_value(VALUE val, SDL_PixelFormat* format)
  */
 static VALUE Surface_unset_color_key(VALUE self)
 {
-    HANDLE_ERROR(SDL_SetColorKey(Get_SDL_Surface(self), SDL_FALSE, 0));
+    HANDLE_ERROR(SDL_SetSurfaceColorKey(Get_SDL_Surface(self), SDL_FALSE, 0));
     return Qnil;
 }
 
@@ -2314,7 +2314,7 @@ static VALUE Surface_set_color_key(VALUE self, VALUE key)
     if (key == Qnil)
         return Surface_unset_color_key(self);
 
-    HANDLE_ERROR(SDL_SetColorKey(surface, SDL_TRUE, pixel_value(key, surface->format)));
+    HANDLE_ERROR(SDL_SetSurfaceColorKey(surface, SDL_TRUE, pixel_value(key, surface->format)));
 
     return key;
 }
@@ -2330,7 +2330,7 @@ static VALUE Surface_set_color_key(VALUE self, VALUE key)
 static VALUE Surface_color_key(VALUE self)
 {
     Uint32 key;
-    if (SDL_GetColorKey(Get_SDL_Surface(self), &key) < 0)
+    if (SDL_GetSurfaceColorKey(Get_SDL_Surface(self), &key) < 0)
         return Qnil;
     else
         return UINT2NUM(key);
@@ -2543,7 +2543,7 @@ FIELD_ACCESSOR(Rect, SDL_Rect, h);
 static VALUE Rect_intersection(VALUE self, VALUE other)
 {
     VALUE result = Rect_s_allocate(cRect);
-    if (SDL_IntersectRect(Get_SDL_Rect(self), Get_SDL_Rect(other), Get_SDL_Rect(result))) {
+    if (SDL_GetRectIntersection(Get_SDL_Rect(self), Get_SDL_Rect(other), Get_SDL_Rect(result))) {
         return result;
     } else {
         return Qnil;
@@ -2560,7 +2560,7 @@ static VALUE Rect_intersection(VALUE self, VALUE other)
 static VALUE Rect_union(VALUE self, VALUE other)
 {
     VALUE result = Rect_s_allocate(cRect);
-    SDL_UnionRect(Get_SDL_Rect(self), Get_SDL_Rect(other), Get_SDL_Rect(result));
+    SDL_GetRectUnion(Get_SDL_Rect(self), Get_SDL_Rect(other), Get_SDL_Rect(result));
     return result;
 }
 
@@ -2788,7 +2788,7 @@ static VALUE ScreenSaver_disable(VALUE self)
  */
 static VALUE ScreenSaver_enabled_p(VALUE self)
 {
-    return INT2BOOL(SDL_IsScreenSaverEnabled());
+    return INT2BOOL(SDL_ScreenSaverEnabled());
 }
 
 /*
