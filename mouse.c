@@ -166,7 +166,7 @@ static VALUE Mouse_s_focused_window(VALUE self)
  */
 static VALUE Cursor_s_show(VALUE self)
 {
-    HANDLE_ERROR(SDL_ShowCursor(SDL_ENABLE));
+    HANDLE_ERROR(SDL_ShowCursor());
     return Qnil;
 }
 
@@ -176,7 +176,7 @@ static VALUE Cursor_s_show(VALUE self)
  */
 static VALUE Cursor_s_hide(VALUE self)
 {
-    HANDLE_ERROR(SDL_ShowCursor(SDL_DISABLE));
+    HANDLE_ERROR(SDL_HideCursor());
     return Qnil;
 }
 
@@ -185,7 +185,7 @@ static VALUE Cursor_s_hide(VALUE self)
  */
 static VALUE Cursor_s_shown_p(VALUE self)
 {
-    return INT2BOOL(HANDLE_ERROR(SDL_ShowCursor(SDL_QUERY)));
+    return INT2BOOL(HANDLE_ERROR(SDL_CursorVisible()));
 }
 
 /*
