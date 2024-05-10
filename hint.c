@@ -17,7 +17,7 @@ static VALUE sym_priority;
  */
 static VALUE Hints_s_clear(VALUE self)
 {
-    SDL_ClearHints();
+    SDL_ResetHints();
     return Qnil;
 }
 
