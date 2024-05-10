@@ -130,3 +130,7 @@ task "clean" do
   sh "rm -r doc/doc-en"
   sh "rm #{C_FROM_M4_FILES.join(' ')}"
 end
+
+task "mclean" do
+  sh "rm #{C_FROM_M4_FILES.join(' ')}"
+end
